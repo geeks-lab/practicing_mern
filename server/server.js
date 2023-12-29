@@ -13,6 +13,8 @@ const upload = multer({ storage });
 const app = express();
 const PORT = 5000;
 
+app.use("/uploads", express.static("uploads"));
+
 app.post("/upload", upload.single("imageTest"), (req, res) => {
   console.log(req.file);
   res.json(req.file);
