@@ -33,24 +33,21 @@ mongoose
   .then(() => {
     console.log("MongoDB Connected.");
     app.use("/uploads", express.static("uploads"));
-    app.post("/upload", upload.single("image"), async (req, res) => {
+    app.post("/images", upload.single("image"), async (req, res) => {
       // Making the new Instance about the model
-      await new Image({
+      const image = await new Image({
         key: req.file.filename,
         originalFileName: req.file.originalname,
       }).save();
-      res.json(req.file);
+      res.json(image);
     });
-
+    // New API: Read and return all the information about the uploaded on the database.
+    app.get("/images", async (req, res) => {
+      const images = await Image.find();
+      res.json(images);
+    });
     app.listen(PORT, () =>
       console.log("Express server listening on PORT " + PORT)
     );
   })
   .catch((err) => console.log(err));
-
-// Changed the location from here to after then, because if the database is not connected, the server should not be started.
-// app.use("/uploads", express.static("uploads"));
-
-// app.post("/upload", upload.single("image"), (req, res) => res.json(req.file));
-
-// app.listen(PORT, () => console.log("Express server listening on PORT " + PORT));

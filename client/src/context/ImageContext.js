@@ -1,0 +1,21 @@
+import React, { createContext, useState, useEffect } from "react";
+import axios from "axios";
+
+export const ImageContext = createContext();
+
+export const ImageProvider = (prop) => {
+  const [images, setImages] = useState([]);
+  useEffect(() => {
+    axios
+      .get("/images") // localhost:5000 is not necessary at here thanks to the proxy
+      .then((result) => {
+        setImages(result.data);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+  return (
+    <ImageContext.Provider value={[images, setImages]}>
+      {prop.children}
+    </ImageContext.Provider>
+  );
+};
