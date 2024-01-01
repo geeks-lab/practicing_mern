@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useContext } from "react";
+import { ImageContext } from "../context/ImageContext";
 
-const ImageList = ({ images }) => {
+const ImageList = () => {
+  const [images] = useContext(ImageContext);
   // getting the image as props from the parent
   const imgList = images.map((image) => (
     <img
