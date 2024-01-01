@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const ImageList = () => {
-  const [images, setImages] = useState([]);
-  useEffect(() => {
-    axios
-      .get("/images") // localhost:5000 is not necessary at here thanks to the proxy
-      .then((result) => setImages(result.data))
-      .catch((err) => console.error(err));
-  }, []);
+const ImageList = ({ images }) => {
+  // getting the image as props from the parent
   const imgList = images.map((image) => (
     <img
       key={image.key}
