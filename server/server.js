@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const multer = require("multer");
 const { v4: uuid } = require("uuid");
@@ -24,19 +25,14 @@ const app = express();
 const PORT = 5000;
 
 mongoose
-  .connect(
-    "mongodb+srv://admin:irq6GQYpysCMKbtz@mongocluster.1bagdmk.mongodb.net/?retryWrites=true&w=majority",
-    {
-      useCreateIndex: true, // incase of using Index. If this is true, it creats an index for the ones that doesn't have.
-    }
-  )
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected.");
     app.use("/uploads", express.static("uploads"));
-
-    app.post("/upload", upload.single("image"), (req, res) =>
-      res.json(req.file)
-    );
+    app.post("/upload", upload.single("image"), (req, res) => {
+      console.log(req.file);
+      res.json(req.file);
+    });
 
     app.listen(PORT, () =>
       console.log("Express server listening on PORT " + PORT)
