@@ -5,6 +5,10 @@ const { v4: uuid } = require("uuid");
 const mime = require("mime-types");
 const mongoose = require("mongoose");
 
+const Image = require("./models/Image"); // Calling the Imgage model
+// the other way to do it like the above is `const Images = mongoose.model("image")`
+// Using the upper one is better in terms of using typescripts(needs the type interface) in the future.
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "./uploads"),
   filename: (req, file, cb) =>
@@ -29,8 +33,12 @@ mongoose
   .then(() => {
     console.log("MongoDB Connected.");
     app.use("/uploads", express.static("uploads"));
-    app.post("/upload", upload.single("image"), (req, res) => {
-      console.log(req.file);
+    app.post("/upload", upload.single("image"), async (req, res) => {
+      // Making the new Instance about the model
+      await new Image({
+        key: req.file.filename,
+        originalFileName: req.file.originalname,
+      }).save();
       res.json(req.file);
     });
 
