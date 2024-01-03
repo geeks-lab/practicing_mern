@@ -27,7 +27,7 @@ userRouter.post("/register", async (req, res) => {
   }
 });
 
-userRouter.post("/login", async (req, res) => {
+userRouter.patch("/login", async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
     const isValid = await compare(req.body.password, user.hashedPassword);
