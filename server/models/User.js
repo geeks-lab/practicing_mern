@@ -15,4 +15,3 @@ const UserSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("user", UserSchema);
-0;
