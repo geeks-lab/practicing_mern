@@ -11,17 +11,18 @@ userRouter.post("/register", async (req, res) => {
     if (req.body.username.length < 3)
       throw new Error("username을 6자 이상으로 해주세요");
     const hashedPassword = await hash(req.body.password, 10);
-    const user = await User({
+    const user = await new User({
       name: req.body.name,
       username: req.body.username,
       hashedPassword,
       session: [{ createdAt: new Date() }],
     }).save();
     const session = user.session[0];
-    res.json({
+    return res.json({
       message: "user registered!",
       sessionId: session._id,
       name: user.name,
+      userId: user._id,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -41,6 +42,7 @@ userRouter.patch("/login", async (req, res) => {
       message: "user validated",
       sessionId: session._id,
       name: user.name,
+      userId: user._id,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -56,6 +58,21 @@ userRouter.patch("/logout", async (req, res) => {
     );
     res.json({ message: "user is logged out." });
   } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+userRouter.get("/me", (req, res) => {
+  try {
+    if (!req.user) throw new Error("권한이 없습니다.");
+    res.json({
+      message: "success",
+      sessionId: req.headers.sessionid,
+      name: req.user.name,
+      userId: req.user._id,
+    });
+  } catch (error) {
+    console.error(error);
     res.status(400).json({ message: error.message });
   }
 });
