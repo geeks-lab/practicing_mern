@@ -22,8 +22,8 @@ const LoginPage = () => {
         sessionId: result.data.sessionId,
         userId: result.data.userId,
       });
-      toast.success("로그인 성공!");
       navigate("/");
+      toast.success("로그인 성공!");
     } catch (error) {
       console.error(error.response);
       toast.error(error.response.data.message);
