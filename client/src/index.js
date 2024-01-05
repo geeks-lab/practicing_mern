@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import App from "./App";
 import { ImageProvider } from "./context/ImageContext";
 import { BrowserRouter } from "react-router-dom";
@@ -12,6 +12,5 @@ root.render(
         <App />
       </ImageProvider>
     </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/User");
 
-const authenticate = async (res, req, next) => {
+const authenticate = async (req, res, next) => {
   const { sessionid } = req.headers;
   if (!sessionid || !mongoose.isValidObjectId(sessionid)) return next();
   const user = await User.findOne({ "session._id": sessionid });
