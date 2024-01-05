@@ -1,13 +1,20 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import App from "./App";
 import { ImageProvider } from "./context/ImageContext";
+import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter } from "react-router-dom";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const container = document.getElementById("root");
+const root = createRoot(container);
 root.render(
   <React.StrictMode>
-    <ImageProvider>
-      <App />
-    </ImageProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <ImageProvider>
+          <App />
+        </ImageProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );
