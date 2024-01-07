@@ -26,6 +26,9 @@ export const ImageProvider = (prop) => {
           .then((result) => setMyImages(result.data))
           .catch((err) => console.error(err));
       }, 0);
+    } else {
+      setMyImages([]);
+      setIsPublic(true);
     }
   }, [me]);
   return (
