@@ -29,6 +29,7 @@ imageRouter.post("/", upload.single("image"), async (req, res) => {
   }
 });
 
+// public 이미지만 제공
 imageRouter.get("/", async (req, res) => {
   const images = await Image.find({ public: true });
   res.json(images);
