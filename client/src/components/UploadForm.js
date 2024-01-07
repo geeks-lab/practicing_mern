@@ -14,6 +14,7 @@ const UploadForm = () => {
   const [imgSrc, setImgSrc] = useState(null);
   const [fileName, setFileName] = useState(defautlFileName);
   const [percent, setPercent] = useState(0);
+  const [isPublic, setIsPublic] = useState(true); // default:true
 
   const imageSelectHandler = (event) => {
     const imageFile = event.target.files[0];
@@ -28,6 +29,7 @@ const UploadForm = () => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("image", file);
+    formData.append("public", isPublic);
     try {
       const res = await axios.post("/images", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -43,7 +45,7 @@ const UploadForm = () => {
         setImgSrc(null);
       }, 3000);
     } catch (err) {
-      toast.error(err.message);
+      toast.error(err.response.data.message);
       setPercent(0);
       setFileName(defautlFileName);
       setImgSrc(null);
@@ -54,6 +56,7 @@ const UploadForm = () => {
   return (
     <form onSubmit={onSubmit}>
       <img
+        alt=""
         src={imgSrc}
         className={`image-preview ${imgSrc && "image-preview-show"}`}
       />
@@ -67,6 +70,13 @@ const UploadForm = () => {
           onChange={imageSelectHandler}
         />
       </div>
+      <input
+        type="checkbox"
+        id="public-check"
+        value={!isPublic}
+        onChange={() => setIsPublic(!isPublic)}
+      />
+      <label htmlFor="public-check">비공개</label>
       <button
         type="submit"
         style={{
