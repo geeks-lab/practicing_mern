@@ -20,10 +20,12 @@ export const ImageProvider = (prop) => {
   useEffect(() => {
     // 로그인 했을 때 보이는 리스트
     if (me) {
-      axios
-        .get("/users/me/images")
-        .then((result) => setMyImages(result.data))
-        .catch((err) => console.error(err));
+      setTimeout(() => {
+        axios
+          .get("/users/me/images")
+          .then((result) => setMyImages(result.data))
+          .catch((err) => console.error(err));
+      }, 0);
     }
   }, [me]);
   return (
