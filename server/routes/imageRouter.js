@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 
 const fileUnlink = promisify(fs.unlink);
 
-imageRouter.post("/", upload.array("image", 5), async (req, res) => {
+imageRouter.post("/", upload.array("image", 30), async (req, res) => {
   try {
     if (!req.user) throw new Error("권한이 없습니다.");
     const images = await Promise.all(
@@ -33,10 +33,27 @@ imageRouter.post("/", upload.array("image", 5), async (req, res) => {
   }
 });
 
-// public 이미지만 제공
 imageRouter.get("/", async (req, res) => {
-  const images = await Image.find({ public: true });
-  res.json(images);
+  try {
+    const { lastid } = req.query;
+    if (lastid && !mongoose.isValidObjectId(lastid)) {
+      throw new Error("invalid lastid");
+    }
+    const images = await Image.find(
+      lastid
+        ? {
+            public: true,
+            _id: { $lt: lastid },
+          }
+        : { public: true } // 첫페이지라 lastid가 없을 경우 예외처리
+    )
+      .sort({ _id: -1 })
+      .limit(20);
+    res.json(images);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error.message });
+  }
 });
 
 imageRouter.delete("/:imageId", async (req, res) => {
