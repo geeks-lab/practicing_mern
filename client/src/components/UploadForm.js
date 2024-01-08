@@ -6,7 +6,7 @@ import ProgressBar from "./ProgressBar";
 import { ImageContext } from "../context/ImageContext";
 
 const UploadForm = () => {
-  const { setImages } = useContext(ImageContext);
+  const { setImages, setMyImages } = useContext(ImageContext);
   const [files, setFiles] = useState(null);
 
   const [previews, setPreviews] = useState([]); // 배열 안에 객체를 넣어줄 겁니다. a 객체: 이미지 소스와 파일네임
@@ -51,7 +51,11 @@ const UploadForm = () => {
           setPercent(Math.round((100 * e.loaded) / e.total));
         },
       });
-      setImages((prevData) => [...prevData, ...res.data]);
+      if (isPublic) {
+        setImages((prevData) => [...res.data, ...prevData]);
+      }
+      setMyImages((prevData) => [...res.data, ...prevData]);
+
       toast.success("이미지 업로드 성공");
       setTimeout(() => {
         setPercent(0);
