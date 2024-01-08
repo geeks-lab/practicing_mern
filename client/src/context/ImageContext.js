@@ -8,10 +8,12 @@ export const ImageProvider = (prop) => {
   const [myImages, setMyImages] = useState([]);
   const [isPublic, setIsPublic] = useState(false);
   const [imageUrl, setImageUrl] = useState("/images");
+  const [imageLoading, setImageLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const [me] = useContext(AuthContext);
 
   useEffect(() => {
-    // 로그인 안해도 보이는 리스트
+    setImageLoading(true);
     axios
       .get(imageUrl) // localhost:5000 is not necessary at here thanks to the proxy
       .then((result) => {
@@ -21,7 +23,11 @@ export const ImageProvider = (prop) => {
         // but the second one needs to add images to the dependency [imageUrl, images]
         setImages((prevData) => [...prevData, ...result.data]);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setImageError(err);
+      })
+      .finally(() => setImageLoading(false));
   }, [imageUrl]);
   useEffect(() => {
     // 로그인 했을 때 보이는 리스트
@@ -38,7 +44,7 @@ export const ImageProvider = (prop) => {
     }
   }, [me]);
   const loadMoreImages = () => {
-    if (images.length === 0) return;
+    if (images.length === 0 || imageLoading) return;
     const lastImageId = images[images.length - 1]._id;
     setImageUrl(`/images?lastid=${lastImageId}`);
   };
@@ -52,6 +58,8 @@ export const ImageProvider = (prop) => {
         isPublic,
         setIsPublic,
         loadMoreImages,
+        imageLoading,
+        imageError,
       }}
     >
       {prop.children}
