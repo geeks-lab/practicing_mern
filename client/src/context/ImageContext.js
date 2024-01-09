@@ -20,15 +20,11 @@ export const ImageProvider = (prop) => {
   const pastImageUrlRef = useRef();
 
   useEffect(() => {
-    if (pastImageUrlRef.current === imageUrl) return; // isPublic이 바뀔 때도 호출 되는것을 막기위함
+    if (pastImageUrlRef.current === imageUrl) return;
     setImageLoading(true);
     axios
-      .get(imageUrl) // localhost:5000 is not necessary at here thanks to the proxy
+      .get(imageUrl)
       .then((result) => {
-        //either way works
-        //setImages((prevData) => [...prevData, ...result.data]);
-        //setImages([...images, ...result.data]);
-        // but the second one needs to add images to the dependency [imageUrl, images]
         isPublic
           ? setImages((prevData) => [...prevData, ...result.data])
           : setMyImages((prevData) => [...prevData, ...result.data]);
@@ -42,8 +38,8 @@ export const ImageProvider = (prop) => {
         pastImageUrlRef.current = imageUrl;
       });
   }, [imageUrl, isPublic]);
+
   useEffect(() => {
-    // 로그인 했을 때 보이는 리스트
     if (me) {
       setTimeout(() => {
         axios

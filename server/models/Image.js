@@ -11,6 +11,7 @@ const ImageSchema = new mongoose.Schema(
     public: { type: Boolean, required: true, default: false },
     key: { type: String, required: true }, // mongoose will make the primary key ("_id") automatically
     originalFileName: { type: String, required: true },
+    texts: { type: String },
   },
   { timestamps: true } // It adds the time not only when it's created, but also when it's modified.
 );
