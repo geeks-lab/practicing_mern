@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { useParams } from "react-router";
 import { ImageContext } from "../context/ImageContext";
 import { AuthContext } from "../context/AuthContext";
@@ -12,14 +12,41 @@ const ImagePage = () => {
   const { images, setImages, setMyImages } = useContext(ImageContext);
   const [me] = useContext(AuthContext);
   const [hasLiked, setHasLiked] = useState(false);
-  const image = images.find((image) => image._id === imageId);
+  const [image, setImage] = useState();
+  const [error, setError] = useState(false);
+  const imageRef = useRef();
+
+  useEffect(() => {
+    imageRef.current = images.find((image) => image._id === imageId);
+  }, [images, imageId]);
+
+  // imageId가 바뀔 때만 호출(맨 처음에만)
+  useEffect(() => {
+    if (imageRef.current) {
+      // 배열에 이미지가 존재할 때
+      setImage(imageRef.current);
+    } else {
+      // 배열에 이미지가 존재하지 않으면 무조건 서버 호출
+      axios
+        .get(`/images/${imageId}`)
+        .then(({ data }) => {
+          setError(false);
+          setImage(data);
+        })
+        .catch((error) => {
+          setError(true);
+          toast.error(error.response.data.message);
+        });
+    }
+  }, [imageId]);
 
   useEffect(() => {
     if (me && image && image.likes.includes(me.userId)) {
       setHasLiked(true);
     }
   }, [me, image]);
-  if (!image) return <h3>Loading...</h3>;
+  if (error) return <h3>Error...</h3>;
+  else if (!image) return <h3>Loading...</h3>;
 
   const updateImage = (images, image) =>
     [...images.filter((image) => image._id !== imageId), image].sort(
