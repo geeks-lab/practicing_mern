@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "./UploadForm.css";
-import ProgressBar from "./ProgressBar";
+//import ProgressBar from "./ProgressBar";
 import { ImageContext } from "../context/ImageContext";
 import { useParams } from "react-router";
 
@@ -38,6 +38,11 @@ const UploadForm = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    if (textValue.length > 300) {
+      toast.error("300글자 이하만 등록이 가능합니다.");
+      return;
+    }
     const formData = new FormData();
 
     for (let file of files) {
@@ -45,7 +50,7 @@ const UploadForm = () => {
     }
 
     formData.append("public", isPublic);
-    formData.append("texts", textValue); // Add texts to the FormData
+    formData.append("texts", textValue);
 
     try {
       const res = await axios.post("/images", formData, {
@@ -64,6 +69,7 @@ const UploadForm = () => {
       setTimeout(() => {
         setPercent(0);
         setPreviews([]);
+        setTextValue("");
       }, 3000);
     } catch (err) {
       toast.error(err.response.data.message);
@@ -94,7 +100,7 @@ const UploadForm = () => {
   return (
     <form onSubmit={onSubmit}>
       <div style={{ display: "flex", flexWrap: "wrap" }}>{previewImages}</div>
-      <ProgressBar percent={percent} />
+      {/* <ProgressBar percent={percent} /> */}
       <div className={"file-dropper"}>
         {fileName}
         <input
