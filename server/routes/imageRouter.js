@@ -56,6 +56,24 @@ imageRouter.get("/", async (req, res) => {
   }
 });
 
+imageRouter.get("/:imageId", async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    console.log(imageId);
+    if (!mongoose.isValidObjectId(imageId))
+      throw new Error("올바르지 않은 이미지id입니다.");
+    const image = await Image.findOne({ _id: imageId });
+    if (!image) throw new Error("해당 이미지는 존재하지 않습니다.");
+    if (!image.public && (!req.user || req.user.id !== image.user.id)) {
+      throw new Error("권한이 없습니다.");
+    }
+    res.json(image);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error.message });
+  }
+});
+
 imageRouter.delete("/:imageId", async (req, res) => {
   // user 권한 확인
   // 사진 삭제(1. delete the pic in the "uploads" folder 2. delete the image in the DB)
