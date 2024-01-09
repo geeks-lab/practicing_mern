@@ -132,4 +132,57 @@ imageRouter.patch("/:imageId/unlike", async (req, res) => {
   }
 });
 
+// 댓글 추가
+imageRouter.post("/:imageId/comments", async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    const { text } = req.body;
+
+    if (!mongoose.isValidObjectId(imageId))
+      throw new Error("올바르지 않은 이미지 id입니다.");
+
+    const image = await Image.findById(imageId);
+
+    if (!image) throw new Error("해당 이미지는 존재하지 않습니다.");
+
+    if (!text) throw new Error("댓글 내용을 입력하세요.");
+
+    const comment = {
+      user: {
+        _id: req.user.id,
+        username: req.user.username,
+      },
+      text,
+    };
+
+    image.comments.push(comment);
+
+    await image.save();
+
+    res.json(comment);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// 댓글 목록 조회
+imageRouter.get("/:imageId/comments", async (req, res) => {
+  try {
+    const { imageId } = req.params;
+
+    if (!mongoose.isValidObjectId(imageId))
+      throw new Error("올바르지 않은 이미지 id입니다.");
+
+    const image = await Image.findById(imageId);
+
+    if (!image) throw new Error("해당 이미지는 존재하지 않습니다.");
+
+    res.json(image.comments);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: error.message });
+  }
+});
+
 module.exports = { imageRouter };
