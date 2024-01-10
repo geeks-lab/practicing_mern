@@ -119,7 +119,7 @@ const ImagePage = () => {
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "auto", paddingTop: "20px" }}>
+    <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
       {/* 추가된 부분: 게시 날짜와 작성자 정보 */}
       <div style={{ marginBottom: "10px", textAlign: "right" }}>
         <p style={{ margin: 0 }}>

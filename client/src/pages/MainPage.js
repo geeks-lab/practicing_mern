@@ -7,7 +7,6 @@ const MainPage = () => {
   const [me] = useContext(AuthContext);
   return (
     <div>
-      <h2>사진첩</h2>
       {me && <UploadForm />}
       <ImageList />
     </div>

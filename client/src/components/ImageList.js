@@ -16,11 +16,6 @@ const ImageList = () => {
   const [me] = useContext(AuthContext);
   const elementRef = useRef(null);
 
-  // const lastImageId = images.length > 0 ? images[images.length - 1]._id : null;
-  // const loadMoreImages = useCallback(() => {
-  //   if (imageLoading || !lastImageId) return;
-  //   setImageUrl(`${isPublic ? "" : "/users/me"}/images?lastid=${lastImageId}`);
-  // }, [images, imageLoading, isPublic]);
   const loadMoreImages = useCallback(() => {
     if (images.length === 0 || imageLoading) return;
     const lastImageId = images[images.length - 1]._id;
@@ -50,7 +45,7 @@ const ImageList = () => {
   ));
   return (
     <div>
-      <h3 style={{ display: "inline-block", marginRight: 10 }}>
+      <h3 style={{ display: "inline-block", margin: 10, padding: 20 }}>
         Image List({isPublic ? "공개" : "개인"}사진)
       </h3>
       {me && (

@@ -65,7 +65,11 @@ const RegisterPage = () => {
           setValue={setPasswordCheck}
           type="password"
         />
-        <button type="submit">회원가입</button>
+        <div style={{ marginTop: 15 }}>
+          <button type="submit" className="btn btn-outline-success">
+            회원가입
+          </button>
+        </div>
       </form>
     </div>
   );

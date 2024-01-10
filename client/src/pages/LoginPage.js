@@ -30,15 +30,9 @@ const LoginPage = () => {
       toast.error(error.response.data.message);
     }
   };
+
   return (
-    <div
-      style={{
-        marginTop: 100,
-        maxWidth: 350,
-        marginLeft: "auto",
-        marginRight: "auto",
-      }}
-    >
+    <div className="container mt-5">
       <h3>로그인</h3>
       <form onSubmit={loginHandler}>
         <CustomInput label="회원ID" value={username} setValue={setUsername} />
@@ -48,7 +42,11 @@ const LoginPage = () => {
           setValue={setPassword}
           type="password"
         />
-        <button type="submit">로그인</button>
+        <div style={{ marginTop: 20, width: 100 }}>
+          <button type="submit" className="btn btn-outline-success">
+            로그인
+          </button>
+        </div>
       </form>
     </div>
   );

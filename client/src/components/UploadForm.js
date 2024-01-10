@@ -91,15 +91,14 @@ const UploadForm = () => {
 
   const fileName =
     previews.length === 0
-      ? "이미지 파일을 업로드해주세요"
+      ? "이미지 파일 업로드하기"
       : previews.reduce(
           (previous, current) => previous + `${current.fileName},`,
           ""
         );
 
   return (
-    <form onSubmit={onSubmit}>
-      <div style={{ display: "flex", flexWrap: "wrap" }}>{previewImages}</div>
+    <form onSubmit={onSubmit} style={{ padding: "0 10px" }}>
       {/* <ProgressBar percent={percent} /> */}
       <div className={"file-dropper"}>
         {fileName}
@@ -111,9 +110,10 @@ const UploadForm = () => {
           onChange={imageSelectHandler}
         />
       </div>
+      <div style={{ display: "flex", flexWrap: "wrap" }}>{previewImages}</div>
       <textarea
         style={{ width: "100%", paddingTop: "20px" }}
-        placeholder="How was your day?"
+        placeholder="  코멘트 입력하기"
         value={textValue}
         onChange={(e) => setTextValue(e.target.value)}
       />
@@ -124,13 +124,17 @@ const UploadForm = () => {
         onChange={() => setIsPublic(!isPublic)}
       />
       <label htmlFor="public-check">비공개</label>
+
       <button
         type="submit"
+        className="btn btn-primary mt-3"
         style={{
           width: "100%",
           height: 40,
           borderRadius: 3,
           cursor: "pointer",
+          marginTop: "10px",
+          backgroundColor: "#0D6EFD",
         }}
       >
         제출
