@@ -1,5 +1,16 @@
 const mongoose = require("mongoose");
 
+const CommentSchema = new mongoose.Schema(
+  {
+    user: {
+      _id: { type: mongoose.Types.ObjectId, required: true },
+      username: { type: String, required: true },
+    },
+    text: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
 const ImageSchema = new mongoose.Schema(
   {
     user: {
@@ -12,6 +23,7 @@ const ImageSchema = new mongoose.Schema(
     key: { type: String, required: true }, // mongoose will make the primary key ("_id") automatically
     originalFileName: { type: String, required: true },
     texts: { type: String },
+    comments: [CommentSchema],
   },
   { timestamps: true } // It adds the time not only when it's created, but also when it's modified.
 );

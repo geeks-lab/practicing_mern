@@ -15,18 +15,53 @@ const ImagePage = () => {
   const [image, setImage] = useState();
   const [error, setError] = useState(false);
   const imageRef = useRef();
+  const [commentText, setCommentText] = useState("");
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    // 이미지 변경 시 댓글 목록을 가져오는 함수
+    const fetchComments = async () => {
+      try {
+        const result = await axios.get(`/images/${imageId}/comments`);
+        setComments(result.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchComments(); // 이미지 변경 시 댓글 목록을 가져오도록 호출
+  }, [imageId]);
+
+  const addComment = async () => {
+    try {
+      if (!me) {
+        toast.error("로그인이 필요합니다.");
+        return;
+      }
+
+      const result = await axios.post(`/images/${imageId}/comments`, {
+        text: commentText,
+      });
+
+      setComments((prevComments) => [...prevComments, result.data]);
+
+      setCommentText("");
+
+      toast.success("댓글이 추가되었습니다.");
+    } catch (error) {
+      console.error(error);
+      toast.error("댓글 추가에 실패했습니다.");
+    }
+  };
 
   useEffect(() => {
     imageRef.current = images.find((image) => image._id === imageId);
   }, [images, imageId]);
 
-  // imageId가 바뀔 때만 호출(맨 처음에만)
   useEffect(() => {
     if (imageRef.current) {
-      // 배열에 이미지가 존재할 때
       setImage(imageRef.current);
     } else {
-      // 배열에 이미지가 존재하지 않으면 무조건 서버 호출
       axios
         .get(`/images/${imageId}`)
         .then(({ data }) => {
@@ -112,10 +147,35 @@ const ImagePage = () => {
         </button>
       </div>
 
-      {/* 추가된 부분: 이미지에 글 */}
+      {/* 이미지의 글 */}
       {image.texts && (
         <div style={{ border: "1px solid #ddd", padding: "10px" }}>
           <p style={{ margin: 0 }}>{image.texts}</p>
+        </div>
+      )}
+      {/* 댓글 목록 */}
+      <div style={{ marginTop: "20px" }}>
+        <h4>댓글 목록</h4>
+        <ul>
+          {comments.map((comment) => (
+            <li key={comment._id}>
+              <strong>{comment.user.username}:</strong> {comment.text}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* 댓글 입력 폼 */}
+      {me && (
+        <div style={{ marginTop: "20px" }}>
+          <h4>댓글 추가</h4>
+          <textarea
+            style={{ width: "100%" }}
+            placeholder="댓글을 입력하세요."
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+          />
+          <button onClick={addComment}>댓글 추가</button>
         </div>
       )}
     </div>
