@@ -1,14 +1,50 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ImageContext } from "../context/ImageContext";
 import { AuthContext } from "../context/AuthContext";
 import "./ImageList.css";
 
 const ImageList = () => {
-  const { images, myImages, isPublic, setIsPublic } = useContext(ImageContext);
+  const {
+    images,
+    isPublic,
+    setIsPublic,
+    imageLoading,
+    imageError,
+    setImageUrl,
+  } = useContext(ImageContext);
   const [me] = useContext(AuthContext);
-  const imgList = (isPublic ? images : myImages).map((image) => (
-    <Link key={image.key} to={`/images/${image._id}`}>
+  const elementRef = useRef(null);
+
+  // const lastImageId = images.length > 0 ? images[images.length - 1]._id : null;
+  // const loadMoreImages = useCallback(() => {
+  //   if (imageLoading || !lastImageId) return;
+  //   setImageUrl(`${isPublic ? "" : "/users/me"}/images?lastid=${lastImageId}`);
+  // }, [images, imageLoading, isPublic]);
+  const loadMoreImages = useCallback(() => {
+    if (images.length === 0 || imageLoading) return;
+    const lastImageId = images[images.length - 1]._id;
+    setImageUrl(`${isPublic ? "" : "/users/me"}/images?lastid=${lastImageId}`);
+  }, [images, imageLoading, isPublic, setImageUrl]);
+
+  useEffect(() => {
+    if (!elementRef.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        loadMoreImages();
+      }
+    });
+    observer.observe(elementRef.current);
+    return () => observer.disconnect(); // when the mouse wheel goes up, the same observer
+    // is makeing the error sinsce they are calling the same images
+  }, [loadMoreImages]);
+
+  const imgList = images.map((image, index) => (
+    <Link
+      key={image.key}
+      to={`/images/${image._id}`}
+      ref={index + 5 === images.length ? elementRef : undefined}
+    >
       <img alt="" src={`http://localhost:5000/uploads/${image.key}`} />
     </Link>
   ));
@@ -23,6 +59,8 @@ const ImageList = () => {
         </button>
       )}
       <div className="image-list-container">{imgList}</div>
+      {imageError && <div>Error...</div>}
+      {imageLoading && <div>Loading...</div>}
     </div>
   );
 };

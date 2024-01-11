@@ -22,6 +22,7 @@ imageRouter.post("/", upload.array("image", 30), async (req, res) => {
           public: req.body.public,
           key: file.filename,
           originalFileName: file.originalname,
+          texts: req.body.texts,
         }).save();
         return image;
       })
@@ -50,6 +51,24 @@ imageRouter.get("/", async (req, res) => {
       .sort({ _id: -1 })
       .limit(20);
     res.json(images);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error.message });
+  }
+});
+
+imageRouter.get("/:imageId", async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    console.log(imageId);
+    if (!mongoose.isValidObjectId(imageId))
+      throw new Error("올바르지 않은 이미지id입니다.");
+    const image = await Image.findOne({ _id: imageId });
+    if (!image) throw new Error("해당 이미지는 존재하지 않습니다.");
+    if (!image.public && (!req.user || req.user.id !== image.user.id)) {
+      throw new Error("권한이 없습니다.");
+    }
+    res.json(image);
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: error.message });

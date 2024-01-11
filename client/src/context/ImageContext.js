@@ -1,4 +1,10 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+} from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
 
@@ -6,19 +12,34 @@ export const ImageContext = createContext();
 export const ImageProvider = (prop) => {
   const [images, setImages] = useState([]);
   const [myImages, setMyImages] = useState([]);
-  const [me] = useContext(AuthContext);
   const [isPublic, setIsPublic] = useState(false);
+  const [imageUrl, setImageUrl] = useState("/images");
+  const [imageLoading, setImageLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [me] = useContext(AuthContext);
+  const pastImageUrlRef = useRef();
+
   useEffect(() => {
-    // 로그인 안해도 보이는 리스트
+    if (pastImageUrlRef.current === imageUrl) return;
+    setImageLoading(true);
     axios
-      .get("/images") // localhost:5000 is not necessary at here thanks to the proxy
+      .get(imageUrl)
       .then((result) => {
-        setImages(result.data);
+        isPublic
+          ? setImages((prevData) => [...prevData, ...result.data])
+          : setMyImages((prevData) => [...prevData, ...result.data]);
       })
-      .catch((err) => console.error(err));
-  }, []);
+      .catch((err) => {
+        console.error(err);
+        setImageError(err);
+      })
+      .finally(() => {
+        setImageLoading(false);
+        pastImageUrlRef.current = imageUrl;
+      });
+  }, [imageUrl, isPublic]);
+
   useEffect(() => {
-    // 로그인 했을 때 보이는 리스트
     if (me) {
       setTimeout(() => {
         axios
@@ -31,15 +52,18 @@ export const ImageProvider = (prop) => {
       setIsPublic(true);
     }
   }, [me]);
+
   return (
     <ImageContext.Provider
       value={{
-        images,
+        images: isPublic ? images : myImages,
         setImages,
-        myImages,
         setMyImages,
         isPublic,
         setIsPublic,
+        setImageUrl,
+        imageLoading,
+        imageError,
       }}
     >
       {prop.children}

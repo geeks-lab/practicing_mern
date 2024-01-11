@@ -2,22 +2,23 @@ import React, { useState, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "./UploadForm.css";
-import ProgressBar from "./ProgressBar";
+//import ProgressBar from "./ProgressBar";
 import { ImageContext } from "../context/ImageContext";
+import { useParams } from "react-router";
 
 const UploadForm = () => {
-  const { images, setImages, myImages, setMyImages } = useContext(ImageContext);
+  const { setImages, setMyImages } = useContext(ImageContext);
   const [files, setFiles] = useState(null);
-
-  const [previews, setPreviews] = useState([]); // 배열 안에 객체를 넣어줄 겁니다. a 객체: 이미지 소스와 파일네임
-
+  const [previews, setPreviews] = useState([]);
   const [percent, setPercent] = useState(0);
-  const [isPublic, setIsPublic] = useState(true); // default:true
+  const [isPublic, setIsPublic] = useState(true);
+  const { imageId } = useParams();
+  const [textValue, setTextValue] = useState("");
 
   const imageSelectHandler = async (event) => {
     const imageFiles = event.target.files;
     setFiles(imageFiles);
-    // 여러 이미지 보기
+
     const imagePreviews = await Promise.all(
       [...imageFiles].map(async (imageFile) => {
         return new Promise((resolve, reject) => {
@@ -37,6 +38,11 @@ const UploadForm = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+
+    if (textValue.length > 300) {
+      toast.error("300글자 이하만 등록이 가능합니다.");
+      return;
+    }
     const formData = new FormData();
 
     for (let file of files) {
@@ -44,6 +50,8 @@ const UploadForm = () => {
     }
 
     formData.append("public", isPublic);
+    formData.append("texts", textValue);
+
     try {
       const res = await axios.post("/images", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -51,12 +59,17 @@ const UploadForm = () => {
           setPercent(Math.round((100 * e.loaded) / e.total));
         },
       });
-      if (isPublic) setImages([...images, ...res.data]);
-      else setMyImages([...myImages, res.data]);
+
+      if (isPublic) {
+        setImages((prevData) => [...res.data, ...prevData]);
+      }
+      setMyImages((prevData) => [...res.data, ...prevData]);
+
       toast.success("이미지 업로드 성공");
       setTimeout(() => {
         setPercent(0);
         setPreviews([]);
+        setTextValue("");
       }, 3000);
     } catch (err) {
       toast.error(err.response.data.message);
@@ -87,7 +100,7 @@ const UploadForm = () => {
   return (
     <form onSubmit={onSubmit}>
       <div style={{ display: "flex", flexWrap: "wrap" }}>{previewImages}</div>
-      <ProgressBar percent={percent} />
+      {/* <ProgressBar percent={percent} /> */}
       <div className={"file-dropper"}>
         {fileName}
         <input
@@ -98,6 +111,12 @@ const UploadForm = () => {
           onChange={imageSelectHandler}
         />
       </div>
+      <textarea
+        style={{ width: "100%", paddingTop: "20px" }}
+        placeholder="How was your day?"
+        value={textValue}
+        onChange={(e) => setTextValue(e.target.value)}
+      />
       <input
         type="checkbox"
         id="public-check"
